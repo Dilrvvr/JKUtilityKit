@@ -8,5 +8,8 @@
 #ifndef JKUtilityKit_h
 #define JKUtilityKit_h
 
+#import "JKUtility.h"
+#import "UIView+JKFrame.h"
+#import "UIView+JKUtility.h"
 
 #endif /* JKUtilityKit_h */
