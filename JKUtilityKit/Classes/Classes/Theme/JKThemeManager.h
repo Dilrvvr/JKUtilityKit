@@ -1,14 +1,14 @@
 //
-//  JKAlertThemeManager.h
-//  JKAlertX
+//  JKThemeManager.h
+//  JKTheme
 //
 //  Created by albert on 2020/7/10.
 //
 
 #import <Foundation/Foundation.h>
-#import "JKAlertThemeUtility.h"
+#import "JKThemeUtility.h"
 
-@interface JKAlertThemeManager : NSObject
+@interface JKThemeManager : NSObject
 
 /**
  * 单例对象
@@ -21,7 +21,7 @@
 - (BOOL)checkIsDarkMode;
 
 /** themeStyle */
-@property (nonatomic, assign) JKAlertThemeStyle themeStyle;
+@property (nonatomic, assign) JKThemeStyle themeStyle;
 
 /**
  * 是否自动切换深色/浅色模式
@@ -36,20 +36,20 @@
 /**
  * 浅色主题名称
  * 自动跟随系统切换时的浅色主题名称
- * 默认JKAlertDefaultThemeLight
+ * 默认JKDefaultThemeLight
  */
 @property (nonatomic, copy) NSString *lightThemeName;
 
 /**
  * 深色主题名称
  * 自动跟随系统切换时的深色主题名称
- * 默认JKAlertDefaultThemeDark
+ * 默认JKDefaultThemeDark
  */
 @property (nonatomic, copy) NSString *darkThemeName;
 
 /**
  * 主题名称
- * 默认JKAlertDefaultThemeLight
+ * 默认JKDefaultThemeLight
  */
 @property (nonatomic, copy) NSString *themeName;
 

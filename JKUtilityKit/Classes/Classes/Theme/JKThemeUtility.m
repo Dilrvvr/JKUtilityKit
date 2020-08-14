@@ -1,35 +1,37 @@
 //
-//  JKAlertThemeUtility.m
-//  JKAlertX
+//  JKThemeUtility.m
+//  JKTheme
 //
 //  Created by albert on 2020/7/11.
 //
 
-#import "JKAlertThemeUtility.h"
+#import "JKThemeUtility.h"
 
 /** 浅色主题名称 */
-NSString * const JKAlertDefaultThemeLight = @"JKAlertDefaultThemeLight";
+NSString * const JKDefaultThemeLight = @"JKDefaultThemeLight";
 
 /** 深色主题名称 */
-NSString * const JKAlertDefaultThemeDark = @"JKAlertDefaultThemeDark";
+NSString * const JKDefaultThemeDark = @"JKDefaultThemeDark";
+
 
 /** 系统深色/浅色样式改变的通知 */
-NSString * const JKAlertThemeDidChangeNotification = @"JKAlertThemeDidChangeNotification";
+NSString * const JKThemeDidChangeThemeNameNotification = @"JKThemeDidChangeThemeNameNotification";
 
 /** ThemeStyle改变的通知 */
-NSString * const JKAlertThemeStyleDidChangeNotification = @"JKAlertThemeStyleDidChangeNotification";
+NSString * const JKThemeDidChangeThemeStyleNotification = @"JKThemeDidChangeThemeStyleNotification";
+
 
 /** 默认的背景色handlerKey */
-NSString * const JKAlertThemeBackgroundColorHandlerKey = @"backgroundColor";
+NSString * const JKThemeBackgroundColorHandlerKey = @"backgroundColor";
 
 /** 默认的字体颜色handlerKey */
-NSString * const JKAlertThemeTextColorHandlerKey = @"textColor";
+NSString * const JKThemeTextColorHandlerKey = @"textColor";
 
 
 #pragma mark
 #pragma mark - 工具方法
 
-@implementation JKAlertThemeUtility
+@implementation JKThemeUtility
 
 /// 获取keyWindow
 + (UIWindow *)keyWindow {
@@ -56,5 +58,4 @@ NSString * const JKAlertThemeTextColorHandlerKey = @"textColor";
     
     return keyWindow;
 }
-
 @end

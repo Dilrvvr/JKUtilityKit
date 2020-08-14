@@ -1,14 +1,14 @@
 //
-//  JKAlertThemeProvider.m
-//  JKAlertX
+//  JKThemeProvider.m
+//  JKTheme
 //
 //  Created by albert on 2020/7/7.
 //
 
-#import "JKAlertThemeProvider.h"
-#import "JKAlertThemeManager.h"
+#import "JKThemeProvider.h"
+#import "JKThemeManager.h"
 
-@interface JKAlertThemeProvider ()
+@interface JKThemeProvider ()
 
 /** handlerDictionary */
 @property (nonatomic, strong) NSMutableDictionary *handlerDictionary;
@@ -17,66 +17,66 @@
 @property (nonatomic, strong) NSMutableArray *handlerArray;
 @end
 
-@implementation JKAlertThemeProvider
+@implementation JKThemeProvider
 
 + (void)initialize {
     
-    [JKAlertThemeManager sharedManager];
+    [JKThemeManager sharedManager];
 }
 
 #pragma mark
 #pragma mark - Public Method
 
 /**
- * 创建一个JKAlertThemeProvider实例
+ * 创建一个JKThemeProvider实例
  *
- * owner : JKAlertThemeProvider实例的拥有者
- *         若owner已有JKAlertThemeProvider实例，将不会创建新的实例而是将provideHandler添加至该实例
+ * owner : JKThemeProvider实例的拥有者
+ *         若owner已有JKThemeProvider实例，将不会创建新的实例而是将provideHandler添加至该实例
  * handlerKey : provideHandler的缓存可以，使用key可支持handler替换
  * provideHandler : 切换皮肤后调用的block，赋值后将会立即执行一次
  */
-+ (JKAlertThemeProvider *)providerWithOwner:(id <JKAlertThemeProviderProtocol>)owner
-                                 handlerKey:(NSString *)handlerKey
-                             provideHandler:(JKAlertThemeProvideHandler)provideHandler {
++ (JKThemeProvider *)providerWithOwner:(id <JKThemeProviderProtocol>)owner
+                            handlerKey:(NSString *)handlerKey
+                        provideHandler:(JKThemeProvideHandler)provideHandler {
     
-    if (!owner || ![owner conformsToProtocol:@protocol(JKAlertThemeProviderProtocol)]) { return nil; }
+    if (!owner || ![owner conformsToProtocol:@protocol(JKThemeProviderProtocol)]) { return nil; }
     
-    if (owner.jkalert_themeProvider) {
+    if (owner.jk_themeProvider) {
         
-        [owner.jkalert_themeProvider addProvideHandlerForKey:handlerKey handler:provideHandler];
+        [owner.jk_themeProvider addProvideHandlerForKey:handlerKey handler:provideHandler];
         
-        return owner.jkalert_themeProvider;
+        return owner.jk_themeProvider;
     }
     
-    JKAlertThemeProvider *themeProvider = [JKAlertThemeProvider new];
+    JKThemeProvider *themeProvider = [JKThemeProvider new];
     
     [themeProvider setOwner:owner];
     
-    owner.jkalert_themeProvider = themeProvider;
+    owner.jk_themeProvider = themeProvider;
     
-    [owner.jkalert_themeProvider addProvideHandlerForKey:handlerKey handler:provideHandler];
+    [owner.jk_themeProvider addProvideHandlerForKey:handlerKey handler:provideHandler];
     
     return themeProvider;
 }
 
 /**
- * 创建一个JKAlertThemeProvider实例
- * 自动将JKAlertThemeBackgroundColorHandlerKey == @"backgroundColor"作为handlerKey
+ * 创建一个JKThemeProvider实例
+ * 自动将JKThemeBackgroundColorHandlerKey == @"backgroundColor"作为handlerKey
  */
-+ (JKAlertThemeProvider *)providerBackgroundColorWithOwner:(id <JKAlertThemeProviderProtocol>)owner
-                                            provideHandler:(JKAlertThemeProvideHandler)provideHandler {
++ (JKThemeProvider *)providerBackgroundColorWithOwner:(id <JKThemeProviderProtocol>)owner
+                                       provideHandler:(JKThemeProvideHandler)provideHandler {
     
-    return [self providerWithOwner:owner handlerKey:JKAlertThemeBackgroundColorHandlerKey provideHandler:provideHandler];
+    return [self providerWithOwner:owner handlerKey:JKThemeBackgroundColorHandlerKey provideHandler:provideHandler];
 }
 
 /**
- * 创建一个JKAlertThemeProvider实例
- * 自动将JKAlertThemeTextColorHandlerKey == @"textColor"作为handlerKey
+ * 创建一个JKThemeProvider实例
+ * 自动将JKThemeTextColorHandlerKey == @"textColor"作为handlerKey
  */
-+ (JKAlertThemeProvider *)providerTextColorWithOwner:(id <JKAlertThemeProviderProtocol>)owner
-                                      provideHandler:(JKAlertThemeProvideHandler)provideHandler {
++ (JKThemeProvider *)providerTextColorWithOwner:(id <JKThemeProviderProtocol>)owner
+                                 provideHandler:(JKThemeProvideHandler)provideHandler {
     
-    return [self providerWithOwner:owner handlerKey:JKAlertThemeTextColorHandlerKey provideHandler:provideHandler];
+    return [self providerWithOwner:owner handlerKey:JKThemeTextColorHandlerKey provideHandler:provideHandler];
 }
 
 /**
@@ -86,11 +86,11 @@
  * handler : 切换皮肤后调用的block，赋值后将会立即执行一次
  */
 - (void)addProvideHandlerForKey:(NSString *)key
-                        handler:(JKAlertThemeProvideHandler)handler {
+                        handler:(JKThemeProvideHandler)handler {
     
     if (!handler || !self.owner) { return; }
     
-    JKAlertThemeProvideHandler previousHandler = nil;
+    JKThemeProvideHandler previousHandler = nil;
     
     if ([key isKindOfClass:[NSString class]] &&
         key.length > 0) {
@@ -120,7 +120,7 @@
  */
 - (void)executeAllProvideHandler {
     
-    [self.handlerArray enumerateObjectsUsingBlock:^(JKAlertThemeProvideHandler _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    [self.handlerArray enumerateObjectsUsingBlock:^(JKThemeProvideHandler _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         
         obj(self, self.owner);
     }];
@@ -129,7 +129,7 @@
 /**
  * 根据key获取某一handler
  */
-- (JKAlertThemeProvideHandler)provideHandlerForKey:(NSString *)key {
+- (JKThemeProvideHandler)provideHandlerForKey:(NSString *)key {
     
     if (![key isKindOfClass:[NSString class]] ||
         key.length <= 0) {
@@ -137,7 +137,7 @@
         return nil;
     }
     
-    JKAlertThemeProvideHandler handler = [self.handlerDictionary objectForKey:key];
+    JKThemeProvideHandler handler = [self.handlerDictionary objectForKey:key];
     
     return handler;
 }
@@ -153,7 +153,7 @@
         return;
     }
     
-    JKAlertThemeProvideHandler handler = [self.handlerDictionary objectForKey:key];
+    JKThemeProvideHandler handler = [self.handlerDictionary objectForKey:key];
     
     !handler ? : handler(self, self.owner);
 }
@@ -165,7 +165,7 @@
     
     if (!key) { return; }
     
-    JKAlertThemeProvideHandler handler = [self.handlerDictionary objectForKey:key];
+    JKThemeProvideHandler handler = [self.handlerDictionary objectForKey:key];
     
     if (!handler) { return; }
     
@@ -195,7 +195,7 @@
     [self executeAllProvideHandler];
 }
 
-- (void)setOwner:(id<JKAlertThemeProviderProtocol>)owner {
+- (void)setOwner:(id<JKThemeProviderProtocol>)owner {
     
     _owner = owner;
 }
@@ -211,7 +211,7 @@
 - (instancetype)init {
     if (self = [super init]) {
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(themeDidChangeNotification:) name:JKAlertThemeDidChangeNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(themeDidChangeNotification:) name:JKThemeDidChangeThemeNameNotification object:nil];
     }
     return self;
 }

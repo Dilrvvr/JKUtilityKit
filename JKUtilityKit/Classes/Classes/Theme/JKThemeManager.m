@@ -1,19 +1,19 @@
 //
-//  JKAlertThemeManager.m
-//  JKAlertX
+//  JKThemeManager.m
+//  JKTheme
 //
 //  Created by albert on 2020/7/10.
 //
 
-#import "JKAlertThemeManager.h"
+#import "JKThemeManager.h"
 #include <objc/runtime.h>
-#import "JKAlertThemeUtility.h"
+#import "JKThemeUtility.h"
 
-@interface JKAlertThemeManager ()
+@interface JKThemeManager ()
 
 @end
 
-@implementation JKAlertThemeManager
+@implementation JKThemeManager
 
 #pragma mark
 #pragma mark - Public Method
@@ -23,7 +23,7 @@
  */
 + (instancetype)sharedManager {
     
-    static JKAlertThemeManager *sharedManager_ = nil;
+    static JKThemeManager *sharedManager_ = nil;
     
     static dispatch_once_t onceToken;
     
@@ -57,29 +57,33 @@
     return isDark;
 }
 
-- (void)setThemeStyle:(JKAlertThemeStyle)themeStyle {
+- (void)setThemeStyle:(JKThemeStyle)themeStyle {
+    
+    // 无变化
+    if (_themeStyle == themeStyle) { return; }
+    
     _themeStyle = themeStyle;
     
     [self postThemeStyleDidChangeNotification];
     
     switch (themeStyle) {
-        case JKAlertThemeStyleSystem:
+        case JKThemeStyleSystem:
             if (@available(iOS 13.0, *)) {
                 self.autoSwitchDarkMode = YES;
             }
-            self.themeName = [[JKAlertThemeManager sharedManager] checkIsDarkMode] ? JKAlertDefaultThemeLight : JKAlertDefaultThemeDark;
+            self.themeName = [[JKThemeManager sharedManager] checkIsDarkMode] ? self.darkThemeName : self.lightThemeName;
             break;
-        case JKAlertThemeStyleLight:
+        case JKThemeStyleLight:
             if (@available(iOS 13.0, *)) {
                 self.autoSwitchDarkMode = NO;
             }
-            self.themeName = JKAlertDefaultThemeLight;
+            self.themeName = self.lightThemeName;
             break;
-        case JKAlertThemeStyleDark:
+        case JKThemeStyleDark:
             if (@available(iOS 13.0, *)) {
                 self.autoSwitchDarkMode = NO;
             }
-            self.themeName = JKAlertDefaultThemeDark;
+            self.themeName = self.darkThemeName;
             break;
             
         default:
@@ -92,6 +96,12 @@
     if (!themeName ||
         ![themeName isKindOfClass:[NSString class]] ||
         themeName.length <= 0) {
+        
+        return;
+    }
+    
+    // 主题名称无变化
+    if ([_themeName isEqualToString:themeName]) {
         
         return;
     }
@@ -119,23 +129,25 @@
 #pragma mark
 #pragma mark - Private Method
 
+/// 发送themeStyle变化的通知
 - (void)postThemeStyleDidChangeNotification {
     
     if (@available(iOS 13.0, *)) {
         
-        [[NSNotificationCenter defaultCenter] postNotificationName:JKAlertThemeStyleDidChangeNotification object:@(self.themeStyle)];
+        [[NSNotificationCenter defaultCenter] postNotificationName:JKThemeDidChangeThemeStyleNotification object:@(self.themeStyle)];
     }
 }
 
+/// 发送themeName变化的通知
 - (void)postThemeDidChangeNotification {
     
-    UIWindow *keyWindow = JKAlertThemeUtility.keyWindow;
+    UIWindow *keyWindow = JKThemeUtility.keyWindow;
     
     UIView *snapShotImageView = [keyWindow snapshotViewAfterScreenUpdates:NO];
     
     [keyWindow addSubview:snapShotImageView];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:JKAlertThemeDidChangeNotification object:self.themeName];
+    [[NSNotificationCenter defaultCenter] postNotificationName:JKThemeDidChangeThemeNameNotification object:self.themeName];
     
     if (@available(iOS 10.0, *)) {
         
@@ -161,8 +173,9 @@
     }
 }
 
-- (void)jkalert_traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
-    [[JKAlertThemeManager sharedManager] jkalert_traitCollectionDidChange:previousTraitCollection];
+/// 监听系统样式变化
+- (void)jk_traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [[JKThemeManager sharedManager] jk_traitCollectionDidChange:previousTraitCollection];
     
     // 此时self类型为UIScreen
     if (@available(iOS 13.0, *)) {
@@ -173,10 +186,11 @@
         
         if (!appearanceChanged) { return; }
         
-        [[JKAlertThemeManager sharedManager] traitCollectionDidChangeUserInterfaceStyle];
+        [[JKThemeManager sharedManager] traitCollectionDidChangeUserInterfaceStyle];
     }
 }
 
+/// userInterfaceStyle改变
 - (void)traitCollectionDidChangeUserInterfaceStyle {
     
     if (@available(iOS 13.0, *)) {
@@ -191,6 +205,7 @@
     }
 }
 
+/// 交换方法
 + (void)swizzleInstanceMethodWithOriginalClass:(Class)originalClass
                               originalSelector:(SEL)originalSelector
                                  swizzledClass:(Class)swizzledClass
@@ -225,14 +240,12 @@
 
 + (void)load {
     
-    [self swizzleInstanceMethodWithOriginalClass:[UIScreen class] originalSelector:@selector(traitCollectionDidChange:) swizzledClass:[self class] swizzledSelector:@selector(jkalert_traitCollectionDidChange:)];
+    // 交换UIScreen的 '- traitCollectionDidChange:' 来监听系统深色/浅色模式改变
+    [self swizzleInstanceMethodWithOriginalClass:[UIScreen class] originalSelector:@selector(traitCollectionDidChange:) swizzledClass:[self class] swizzledSelector:@selector(jk_traitCollectionDidChange:)];
 }
 
 - (instancetype)init {
     if (self = [super init]) {
-        
-        _lightThemeName = JKAlertDefaultThemeLight;
-        _darkThemeName = JKAlertDefaultThemeDark;
         
         if (@available(iOS 13.0, *)) {
             
@@ -244,5 +257,22 @@
         }
     }
     return self;
+}
+
+#pragma mark
+#pragma mark - Property
+
+- (NSString *)lightThemeName {
+    if (!_lightThemeName) {
+        _lightThemeName = JKDefaultThemeLight;
+    }
+    return _lightThemeName;
+}
+
+- (NSString *)darkThemeName {
+    if (!_darkThemeName) {
+        _darkThemeName = JKDefaultThemeDark;
+    }
+    return _darkThemeName;
 }
 @end
