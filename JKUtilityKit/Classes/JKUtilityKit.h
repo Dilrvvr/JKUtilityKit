@@ -9,7 +9,9 @@
 #define JKUtilityKit_h
 
 #import "JKUtility.h"
-#import "UIView+JKFrame.h"
-#import "UIView+JKUtility.h"
+#import "UIColor+JKUtilityDynamic.h"
+#import "UIView+JKUtilityFrame.h"
+#import "UIView+JKUtilityMethod.h"
+#import "NSObject+JKUtilityProperty.h"
 
 #endif /* JKUtilityKit_h */

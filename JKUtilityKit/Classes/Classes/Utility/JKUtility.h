@@ -173,12 +173,3 @@ JKStopTimerBlock JKDispatchTimerWithQueue(dispatch_queue_t queue, id target, dou
 /// 让手机振动一下
 + (void)vibrateDevice;
 @end
-
-#pragma mark
-#pragma mark - Category
-
-@interface NSObject (JKUtility)
-
-/// iOS13获取对象属性 keyPath: 无下划线时会自动添加下划线
-- (id)jk_getIvarValueForWithKeyPath:(NSString *)keyPath;
-@end
